@@ -43,6 +43,13 @@ var example_program_sensor = function(target){
   //              for details of color sensor working mode: http://www.ev-3.net/en/archives/847
   // 
   // e.g. set port 1 as a color sensor in mode color
+  // 
+  target.registerSensor(2, target.S_TYPE_IR, target.SM_IR_NOBEACON);
+
+  target.registerSensorListener(2, function(result) {
+    console.log("RESULT FROM IR: ", result);
+  });
+
 
   target.registerSensor(1,target.S_TYPE_COLOR,target.SM_COL_COLOR);
 

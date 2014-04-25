@@ -77,6 +77,30 @@ var TouchSensor = function(port,type,mode){
 	return sensor;
 }
 
+// ev3 enum info
+// http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
+var InfraSensor = function(port,type,mode){
+	//paratistic inheritance
+	//http://www.crockford.com/javascript/inheritance.html
+	var sensor = new Sensor(port,type,mode);
+	sensor.processData = function(counter,value){
+		if(counter != this.request_counter){
+			return
+		}
+
+		console.log("INFRA", counter, " VALUE ", value);
+
+		var payload = value.substr(10,2);
+		var result = false;
+		if(payload == "00") { result = false; } else if(payload == "64") { result=true; }
+		for(i=0; i < this.callbacks.length ; i++){
+			this.callbacks[i](result);
+		}
+	}
+
+	return sensor;
+}
+
 module.exports.COL_NULL = "00";
 module.exports.COL_BLACK = "0c";
 module.exports.COL_BLUE = "19";
@@ -202,7 +226,8 @@ var Ev3_base = function(btport){
 }; 
 
 //-------------- Sensor ---------------------
-Ev3_base.prototype.S_TYPE_IR = 0;
+// http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
+Ev3_base.prototype.S_TYPE_IR = "21";
 Ev3_base.prototype.S_TYPE_TOUCH = "10";
 Ev3_base.prototype.S_TYPE_COLOR = "1d";
 Ev3_base.prototype.S_TYPE_USONIC = 0;
@@ -214,7 +239,11 @@ Ev3_base.prototype.SM_COL_RINTENSITY = 0;
 Ev3_base.prototype.SM_COL_AINTENSITY = 1;
 Ev3_base.prototype.SM_COL_COLOR = 2;
 
-Ev3_base.prototype.sensors= [];
+// http://www.mathworks.com/help/simulink/slref/legomindstormsev3infraredsensor.html
+// http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
+Ev3_base.prototype.SM_IR_NOBEACON = 0;
+
+Ev3_base.prototype.sensors = [];
 
 Ev3_base.prototype.sensorResponse = function(counter,value){
 	for (i =0 ; i<this.sensors.length; i++){
@@ -231,6 +260,10 @@ Ev3_base.prototype.registerSensor = function(port,type,mode){
 	if(type == this.S_TYPE_TOUCH){
 		this.sensors[port-1] = new TouchSensor(port,type,mode);
 	}	
+
+	if(type == this.S_TYPE_IR) {
+		this.sensors[port-1] = new InfraSensor(port, type, mode);
+	}
 }
 
 Ev3_base.prototype.registerSensorListener = function(port,callback){
