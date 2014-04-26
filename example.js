@@ -44,9 +44,10 @@ var example_program_sensor = function(target){
   // 
   // e.g. set port 1 as a color sensor in mode color
   // 
-  target.registerSensor(2, target.S_TYPE_IR, target.SM_IR_NOBEACON);
+  var ir_port = 4;
+  target.registerSensor(ir_port, target.S_TYPE_IR, 0);
 
-  target.registerSensorListener(2, function(result) {
+  target.registerSensorListener(ir_port, function(result) {
     console.log("RESULT FROM IR: ", result);
   });
 
@@ -109,7 +110,7 @@ var example_program_sensor = function(target){
   target.registerSensor(2,target.S_TYPE_TOUCH,0)
   target.registerSensorListener(2,function(result){
     //result is a bool value
-    console.log(result);
+    console.log("TOUCH", result);
   });
 }
 
@@ -145,7 +146,7 @@ var robot = new Ev3_base("/dev/tty.EV3-SerialPort"); // put your bluetooth socke
 
 robot.connect(function(){
   //uncomment for motor sample
-	//robot.start_program(example_program_motor); 
+	// robot.start_program(example_program_motor); 
 
   //uncomment for color sensor example
   robot.start_program(example_program_sensor); 

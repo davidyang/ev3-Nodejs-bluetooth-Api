@@ -18,7 +18,7 @@ var Sensor = function(port,type,mode){
 		this.request_counter = counter;
 		//construct buffer
 		pull_command = new Buffer("0B00"+counter+"0001009A000"+ (port-1) + type +"0"+ mode +"60","hex");
-		//console.log(pull_command.toString("hex"));
+		console.log("Pull command", pull_command.toString("hex"));
 		sp.write(pull_command);
 	}
 
@@ -80,22 +80,28 @@ var TouchSensor = function(port,type,mode){
 // ev3 enum info
 // http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
 var InfraSensor = function(port,type,mode){
+
 	//paratistic inheritance
 	//http://www.crockford.com/javascript/inheritance.html
 	var sensor = new Sensor(port,type,mode);
+	// sensor.lastValue = 0;
+
 	sensor.processData = function(counter,value){
 		if(counter != this.request_counter){
-			return
+			return;
 		}
 
-		console.log("INFRA", counter, " VALUE ", value);
+		// if(value != this.lastValue) {
+		// 	this.lastValue = value;
+		// } 
 
 		var payload = value.substr(10,2);
-		var result = false;
-		if(payload == "00") { result = false; } else if(payload == "64") { result=true; }
-		for(i=0; i < this.callbacks.length ; i++){
-			this.callbacks[i](result);
-		}
+		console.log("INFRA PAYLOAD", payload);
+		// var result = false;
+		// if(payload == "00") { result = false; } else if(payload == "64") { result=true; }
+		// for(i=0; i < this.callbacks.length ; i++){
+		// 	this.callbacks[i](result);
+		// }
 	}
 
 	return sensor;
@@ -228,6 +234,7 @@ var Ev3_base = function(btport){
 //-------------- Sensor ---------------------
 // http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
 Ev3_base.prototype.S_TYPE_IR = "21";
+// Ev3_base.prototype.S_TYPE_IR = "1e";
 Ev3_base.prototype.S_TYPE_TOUCH = "10";
 Ev3_base.prototype.S_TYPE_COLOR = "1d";
 Ev3_base.prototype.S_TYPE_USONIC = 0;
@@ -247,7 +254,8 @@ Ev3_base.prototype.sensors = [];
 
 Ev3_base.prototype.sensorResponse = function(counter,value){
 	for (i =0 ; i<this.sensors.length; i++){
-		this.sensors[i].processData(counter,value);
+		if(this.sensors[i])
+			this.sensors[i].processData(counter,value);
 	}
 };
 
@@ -271,8 +279,10 @@ Ev3_base.prototype.registerSensorListener = function(port,callback){
 }
 
 Ev3_base.prototype.pullReadings = function(){
+	// console.log("pulling readings");
 	for (i =0 ; i<this.sensors.length; i++){
-		this.sensors[i].pullReading(this.getCounter(),this.sp);
+		if(this.sensors[i]) 
+			this.sensors[i].pullReading(this.getCounter(),this.sp);
 	}
 }
 
@@ -289,8 +299,8 @@ Ev3_base.prototype.connect = function(callback){
 	connection.on("open", function () {
 		//console.log('open');
 		connection.on('data', function(data) {
-			/*console.log('data received: ' + data.toString('hex')); 
-			console.log('extract counter: ' + data.toString('hex').substr(4,4)); */
+			// console.log('data received: ' + data.toString('hex')); 
+			// console.log('extract counter: ' + data.toString('hex').substr(4,4)); 
 			main.sensorResponse(data.toString('hex').substr(4,4),data.toString('hex'));
 		});
 
@@ -302,6 +312,7 @@ Ev3_base.prototype.connect = function(callback){
 			output = new Buffer(output,"hex");
 			connection.write( output,function(){}); */
 
+			// console.log("sensing function");
 			main.pullReadings();
 
 			setTimeout(function(){
