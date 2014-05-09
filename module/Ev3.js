@@ -18,7 +18,7 @@ var Sensor = function(port,type,mode){
 		this.request_counter = counter;
 		//construct buffer
 		pull_command = new Buffer("0B00"+counter+"0001009A000"+ (port-1) + type +"0"+ mode +"60","hex");
-		console.log("Pull command", pull_command.toString("hex"));
+		// console.log("Pull command", pull_command.toString("hex"));
 		sp.write(pull_command);
 	}
 
@@ -99,7 +99,7 @@ var InfraSensor = function(port,type,mode){
 
 		var payload = value.substr(10,2);
 		var result = parseInt(payload, 16);
-		console.log("INFRA PAYLOAD", value, payload, result);
+		// console.log("INFRA PAYLOAD", value, payload, result);
 		// var result = false;
 		// if(payload == "00") { result = false; } else if(payload == "64") { result=true; }
 		for(i=0; i < this.callbacks.length ; i++){
@@ -302,7 +302,7 @@ Ev3_base.prototype.connect = function(callback){
 	connection.on("open", function () {
 		//console.log('open');
 		connection.on('data', function(data) {
-			console.log('data received: ' + data.toString('hex')); 
+			// console.log('data received: ' + data.toString('hex')); 
 			// console.log('extract counter: ' + data.toString('hex').substr(4,4)); 
 			main.sensorResponse(data.toString('hex').substr(4,4),data.toString('hex'));
 		});
