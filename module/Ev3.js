@@ -35,6 +35,7 @@ Sensor.prototype.processData = function(counter){
 
 //inherited sensors
 var ColorSensor = function(port,type,mode){
+	var i;
 	//paratistic inheritance
 	//http://www.crockford.com/javascript/inheritance.html
 	var sensor = new Sensor(port,type,mode);
@@ -58,6 +59,7 @@ var ColorSensor = function(port,type,mode){
 }
 
 var TouchSensor = function(port,type,mode){
+	var i;
 	//paratistic inheritance
 	//http://www.crockford.com/javascript/inheritance.html
 	var sensor = new Sensor(port,type,mode);
@@ -80,7 +82,7 @@ var TouchSensor = function(port,type,mode){
 // ev3 enum info
 // http://legoev3.codeplex.com/SourceControl/latest#Lego.Ev3.Core/Enums.cs
 var InfraSensor = function(port,type,mode){
-
+	var i;
 	//paratistic inheritance
 	//http://www.crockford.com/javascript/inheritance.html
 	var sensor = new Sensor(port,type,mode);
@@ -96,12 +98,13 @@ var InfraSensor = function(port,type,mode){
 		// } 
 
 		var payload = value.substr(10,2);
-		console.log("INFRA PAYLOAD", payload);
+		var result = parseInt(payload, 16);
+		console.log("INFRA PAYLOAD", value, payload, result);
 		// var result = false;
 		// if(payload == "00") { result = false; } else if(payload == "64") { result=true; }
-		// for(i=0; i < this.callbacks.length ; i++){
-		// 	this.callbacks[i](result);
-		// }
+		for(i=0; i < this.callbacks.length ; i++){
+			this.callbacks[i](result);
+		}
 	}
 
 	return sensor;
@@ -270,7 +273,7 @@ Ev3_base.prototype.registerSensor = function(port,type,mode){
 	}	
 
 	if(type == this.S_TYPE_IR) {
-		this.sensors[port-1] = new InfraSensor(port, type, mode);
+		this.sensors[port-1] = new InfraSensor(port, "00", mode);
 	}
 }
 
@@ -299,7 +302,7 @@ Ev3_base.prototype.connect = function(callback){
 	connection.on("open", function () {
 		//console.log('open');
 		connection.on('data', function(data) {
-			// console.log('data received: ' + data.toString('hex')); 
+			console.log('data received: ' + data.toString('hex')); 
 			// console.log('extract counter: ' + data.toString('hex').substr(4,4)); 
 			main.sensorResponse(data.toString('hex').substr(4,4),data.toString('hex'));
 		});
@@ -317,7 +320,7 @@ Ev3_base.prototype.connect = function(callback){
 
 			setTimeout(function(){
 				sensing();	
-			},400);
+			},1000);
 
 			
 		}
