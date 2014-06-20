@@ -16,13 +16,11 @@ robot.connect(function(){
       //if we see black
       if(result == Ev3.COL_BLACK){
         //set motors A and D to back 100%
-        var output = target.getOutputSequence(-100,0,0,-100);
-        target.sp.write(output,function(){});
+        target.setMotors(-100,0,0,-100);
       }
     });
 
     //set motors A and D to forward 100%
-    var output = target.getOutputSequence(100,0,0,100);
-    target.sp.write(output,function(){});
+    target.setMotors(100,0,0,100);
   });
 });
