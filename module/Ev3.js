@@ -178,7 +178,7 @@ var Ev3_base = function(btport){
 	};
 
 	this.setMotors = function(a,b,c,d,cb){
-		var output = this.getOutputSequence(100,0,0,100);
+		var output = this.getOutputSequence(a,b,c,d);
 		this.sp.write(output,cb || function(){});
 	}
 
