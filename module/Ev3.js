@@ -149,7 +149,7 @@ var Ev3_base = function(btport){
 	this.OUTPUT_BODY_SEQ = "407E018200008"; 
 	this.TERMINATE_SEQ = new Buffer("070055008000000201","hex");
 
-	this.sp = new SerialPort("/dev/rfcomm1", {
+	this.sp = new SerialPort(btport, {
 		  parser: SP.parsers.raw
 	}, false); 
 
